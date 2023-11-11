@@ -9,9 +9,7 @@ class Evaluate
 {
    public:
    std::stack<double> operators; //stack of operands
-   
    std::stack<char> operands; //stack of operators
-
 
    //private:
    double Solver(stack<char> operators, stack<double> operands);
