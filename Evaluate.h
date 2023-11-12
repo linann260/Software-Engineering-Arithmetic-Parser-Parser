@@ -1,17 +1,22 @@
 #include <iostream>
-using namespace std;
 #include <stack>
+using namespace std;
 #ifndef EVALUATE_H
 #define EVALUATE_H
 
 //Note: intially assume that inputs are integers
-class Evaluate
+class Evaluatex
 {
    public:
-   std::stack<double> operators; //stack of operands
-   std::stack<char> operands; //stack of operators
+   char expression; //vector
 
    //private:
-   double Solver(stack<char> operators, stack<double> operands);
+   void MakeStack(char expression, stack<char> &operators, stack<double> &operands);
+   bool isOperator(char expression);
+   void ParenthesesHandler(stack<char> &operators, stack<double> &operands);
+   void OperatorPrecedence(char expression, stack<char> &operators, stack<double> &operands);
+   int getPrecedence(char expression);
+   double SimplyRemainding(stack<char> operators, stack<double> operands);
+   double Solve(char expression);
 };
 #endif
