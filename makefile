@@ -1,4 +1,4 @@
-# Makefile for evaluate.cpp
+# Makefile for the project
 
 # Compiler
 CC := g++
@@ -7,16 +7,16 @@ CC := g++
 CFLAGS := -Wall -std=c++11
 
 # Source files
-SRCS := evaluate.cpp
+SRCS := evaluate.cpp main.cpp tokens.cpp
 
 # Header files
-HEADERS := Evaluate.h
+HEADERS := Evaluate.h Tokens.h
 
 # Object files
 OBJS := $(SRCS:.cpp=.o)
 
 # Executable name
-TARGET := evaluate
+TARGET := myprogram
 
 # Build rule for the executable
 $(TARGET): $(OBJS)
