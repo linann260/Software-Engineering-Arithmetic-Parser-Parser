@@ -10,175 +10,176 @@ using namespace std;
 
 
 bool Evaluate::isOperator(string c) {
-   return c == "+" || c == "-" || c =="*" || c == "/" || c == "%" || c == "^";
+    return c == "+" || c == "-" || c =="*" || c == "/" || c == "%" || c == "^";
 }
 int Evaluate::getPrecedence(char op) {
-   if (op == '^'){
-       return 3;
-   }
+    if (op == '^'){
+        return 3;
+    }
 
+    else if (op == '*' || op == '/' || op == '%'){
+        return 2;
+    }
 
-   else if (op == '*' || op == '/' || op == '%'){
-       return 2;
-   }
+    else if (op == '+' || op == '-'){
+        return 1;
+    }
 
-
-   else if (op == '+' || op == '-'){
-       return 1;
-   }
-   else {
-       return 0;
-   }
+    else {
+        return 0;
+    }
 }
 
 
 double Evaluate::evaluateExpression(const vector<string>& expression) {
-   int index = 0;
-   stack<double> operands;
-   stack<char> operators; // Initializes the two stacks one for the numbers and one for the operators (+,-, etc.)
-   for (const string& val : expression) {
-       if (!isOperator(val) && val[0]!= '(' && val[0]!=')') {
-           double d1;
-           stringstream(val) >> d1;
-           operands.push(d1);
-           index++;
-       }
+    int index = 0;
+    stack<double> operands;
+    stack<char> operators; // Initializes the two stacks one for the numbers and one for the operators (+,-, etc.)
 
+    /* Reads through the vector and stores as two stacks. */
+    for (const string& val : expression) {
+        //
+        if (!isOperator(val) && val[0]!= '(' && val[0]!=')') { //if val is a number and first value is not a parentheses
+            double d1;
+            stringstream(val) >> d1;
+            operands.push(d1);
+            index++;
+        }
 
-       else if (val == "(") { // Comparing string to string so double quotes.
-           operators.push('('); // Make it single quotes because it is a char.
-           index++;
+        else if (val == "(") { // Comparing string to string so double quotes.
+            operators.push('('); // Make it single quotes because it is a char.
+            index++;
+        }
 
+        else if (val == ")") {
+            //Start evaluating until the ( parenthesis.
+            while (!operators.empty() && operators.top() != '(') {
+                char op = operators.top();
+                operators.pop();
+                double operand2 = operands.top();
+                operands.pop();
+                double operand1 = operands.top();
+                operands.pop();
 
-       }
-       else if (val == ")") {
-           //Start evaluating until the ( parenthesis.
-           while (!operators.empty() && operators.top() != '(') {
-             char op = operators.top();
-             operators.pop();
-             double operand2 = operands.top();
-             operands.pop();
-             double operand1 = operands.top();
-             operands.pop();
+                if (op == '+'){
+                    operands.push(operand1 + operand2);
+                }
+                else if (op == '-'){
+                    operands.push(operand1 - operand2);
+                }
+                else if (op == '*'){
+                    operands.push(operand1 * operand2);
+                }
+                else if (op == '/') {
+                    double new_operand = operand2;
+                    double result = operand1 / new_operand;
+                    operands.push(result);
+                }
+                else if (op == '%') {
+                    long new_op1 =  operand1;
+                    long new_op2 = operand2;
+                    operands.push(new_op1 % new_op2);
+                }
+                else if (op == '^')
+                    operands.push(pow(operand1,operand2));
+            }
 
+            operators.pop(); // Remove the '('
+            index++;
+        }
 
+        else if (isOperator(val) && index == 0 && val == "+") {
+            index++;
+        }
 
+        else if (isOperator(val) && index == 0 && val == "-") {
+            operands.push(-1);
+            operators.push('*');
+            index++;
+        }
 
+        else if (isOperator(val) && index!= 0 && val == "-" && expression[index-1] == "(" and expression[index+1] == "(") {
+            operands.push(-1);
+            operators.push('*');
+            index++;
+        }
 
+        else if (isOperator(val)) {
+            while (!operators.empty() && getPrecedence(operators.top()) >= getPrecedence(val[0])) {
+                char op = operators.top();
+                operators.pop();
+                double operand2 = operands.top();
+                operands.pop();
+                double operand1 = operands.top();
+                operands.pop();
 
+                if (op == '+'){
+                    operands.push(operand1 + operand2);
+                }
+                else if (op == '-'){
+                    operands.push(operand1 - operand2);
+                }
+                else if (op == '*'){
+                    operands.push(operand1 * operand2);
+                }
+                else if (op == '/'){
+                    double new_operand = operand2;
+                    double result = operand1 / new_operand;
+                    operands.push(result);
+                }
+                else if (op == '%'){
+                    long new_op1 =  operand1;
+                    long new_op2 = operand2;
+                    operands.push(new_op1 % new_op2);
+                }
+                else if (op == '^'){
+                    operands.push(pow(operand1,operand2));
+                }
+            }
 
+        operators.push(val[0]); // Pushes the new operator at the very end so that we can evaluate the one with precedence first.
+        index++;
+        }
+    }
 
-             if (op == '+')
-                 operands.push(operand1 + operand2);
-             else if (op == '-')
-                 operands.push(operand1 - operand2);
-             else if (op == '*')
-                 operands.push(operand1 * operand2);
-             else if (op == '/') {
-                 double new_operand = operand2;
-                 double result = operand1 / new_operand;
-                 operands.push(result);
-             }
-             else if (op == '%') {
-               long new_op1 =  operand1;
-               long new_op2 = operand2;
-               operands.push(new_op1 % new_op2);
-             }
-             else if (op == '^')
-                 operands.push(pow(operand1,operand2));
-         }
-         operators.pop(); // Remove the '('
-         index++;
-   }
-   else if (isOperator(val) && index == 0 && val == "+") {
-       index++;
-
-
-   }
-   else if (isOperator(val) && index == 0 && val == "-") {
-       operands.push(-1);
-       operators.push('*');
-       index++;
-
-
-   }
-   else if (isOperator(val) && index!= 0 && val == "-" && expression[index-1] == "(" and expression[index+1] == "(") {
-       operands.push(-1);
-       operators.push('*');
-       index++;
-   }
-   else if (isOperator(val)) {
-           while (!operators.empty() && getPrecedence(operators.top()) >= getPrecedence(val[0])) {
-             char op = operators.top();
-             operators.pop();
-             double operand2 = operands.top();
-             operands.pop();
-             double operand1 = operands.top();
-             operands.pop();
-
-
-
-
-
-
-
-
-             if (op == '+')
-                 operands.push(operand1 + operand2);
-             else if (op == '-')
-                 operands.push(operand1 - operand2);
-             else if (op == '*')
-                 operands.push(operand1 * operand2);
-             else if (op == '/'){
-                 double new_operand = operand2;
-                 double result = operand1 / new_operand;
-                 operands.push(result);
-             }
-             else if (op == '%'){
-               long new_op1 =  operand1;
-               long new_op2 = operand2;
-               operands.push(new_op1 % new_op2);
-             }
-             else if (op == '^')
-                 operands.push(pow(operand1,operand2));
-         }
-         operators.push(val[0]); // Pushes the new operator at the very end so that we can evaluate the one with precedence first.
-         index++;
-   }
+    double result = evaluateRemainding(operands, operators);
+    return result;
 }
-double result = evaluateRemainding(operands, operators);
-return result;
-}
+
 double Evaluate::evaluateRemainding(stack<double> & operands, stack<char> & operators) {
-   while (!operators.empty()) {
-     char op = operators.top();
-     operators.pop();
-     double operand2 = operands.top();
-     operands.pop();
-     double operand1 = operands.top();
-     operands.pop();
-     if (op == '+')
-         operands.push(operand1 + operand2);
-     else if (op == '-')
-         operands.push(operand1 - operand2);
-     else if (op == '*')
-         operands.push(operand1 * operand2);
-     else if (op == '/'){
-           double new_operand = operand2;
-           double result = operand1 / new_operand;
-           operands.push(result);
-       }
-     else if (op == '%'){
-           long new_op1 =  operand1;
-           long new_op2 = operand2;
-           operands.push(new_op1 % new_op2);
-             }
-     else if (op == '^')
-           operands.push(pow(operand1,operand2));
- }
+    while (!operators.empty()) {
+        char op = operators.top();
+        operators.pop();
+        double operand2 = operands.top();
+        operands.pop();
+        double operand1 = operands.top();
+        operands.pop();
 
+        if (op == '+'){
+            operands.push(operand1 + operand2);
+        }
+        else if (op == '-'){
+            operands.push(operand1 - operand2);
+        }
+        else if (op == '*'){
+            operands.push(operand1 * operand2);
+        }
+        else if (op == '/'){
+            double new_operand = operand2;
+            double result = operand1 / new_operand;
+            operands.push(result);
+        }
+        else if (op == '%'){
+            long new_op1 =  operand1;
+            long new_op2 = operand2;
+            operands.push(new_op1 % new_op2);
+        }
+        else if (op == '^'){
+            operands.push(pow(operand1,operand2));
+        }
+    }
 
- return operands.top(); // Ending of calculating expression.
+    return operands.top(); // Ending of calculating expression.
 }
 /*
 int main() {
