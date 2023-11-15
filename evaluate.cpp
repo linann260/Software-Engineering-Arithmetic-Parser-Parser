@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 #include "Evaluate.h"
-using namespace std;
 
+using namespace std;
 
 bool Evaluate::isOperator(string c) {
     return c == "+" || c == "-" || c =="*" || c == "/" || c == "%" || c == "^";

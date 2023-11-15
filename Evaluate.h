@@ -1,17 +1,17 @@
-#include <iostream>
-#include <stack>
-#include <vector>
-using namespace std;
 #ifndef EVALUATE_H
 #define EVALUATE_H
 
+#include <iostream>
+#include <stack>
+#include <vector>
+
+using namespace std;
 
 //Note: intially assume that inputs are integers
 class Evaluate
 {
   public:
   vector<char> expression; //vector
-
 
   //private:
   bool isOperator(string c);
@@ -28,4 +28,5 @@ class Evaluate
   double Solve(vector<char> expression);
   */
 };
+
 #endif
